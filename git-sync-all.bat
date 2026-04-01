@@ -5,13 +5,11 @@ REM Edit REPOS, DIST, DEFAULT_DEST below, then run.
 
 setlocal enabledelayedexpansion
 
-REM ═══════════════════════════════════════════════════════════════════════
-REM  EDIT HERE
-REM ═══════════════════════════════════════════════════════════════════════
-set "REPOS=D:\github\pineskyeo\cortex;D:\github\pineskyeo\pinesky-lib"
-set "DIST=D:\github\dist"
-set "DEFAULT_DEST=dc@eupt03:/home/dc/incoming"
-REM ═══════════════════════════════════════════════════════════════════════
+REM ── Load config ────────────────────────────────────────────────────────
+if exist "%~dp0git-sync.conf" call "%~dp0git-sync.conf"
+if "%DEFAULT_DEST%"=="" set "DEFAULT_DEST=user@server:/incoming"
+if "%REPOS%"=="" set "REPOS=."
+if "%DIST%"=="" set "DIST=%USERPROFILE%\dist"
 
 if not exist "%DIST%" mkdir "%DIST%"
 

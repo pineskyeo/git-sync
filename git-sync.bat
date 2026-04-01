@@ -10,11 +10,9 @@ REM Run from any git repository root.
 
 setlocal enabledelayedexpansion
 
-REM ═══════════════════════════════════════════════════════════════════════
-REM  EDIT HERE: default SCP destination
-REM ═══════════════════════════════════════════════════════════════════════
-set "DEFAULT_DEST=dc@eupt03:/home/dc/incoming"
-REM ═══════════════════════════════════════════════════════════════════════
+REM ── Load config ────────────────────────────────────────────────────────
+if exist "%~dp0git-sync.conf" call "%~dp0git-sync.conf"
+if "%DEFAULT_DEST%"=="" set "DEFAULT_DEST=user@server:/incoming"
 
 REM ── Detect repo ────────────────────────────────────────────────────────
 for /f "tokens=*" %%i in ('git rev-parse --show-toplevel 2^>nul') do set "REPO_ROOT=%%i"
