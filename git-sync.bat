@@ -1,15 +1,20 @@
 @echo off
-REM git-sync.bat — Git pull + archive for closed-network transfer
+REM git-sync.bat — Git pull + archive + auto SCP to server
 REM
 REM Usage:
-REM   git-sync.bat                          Pull + archive
-REM   git-sync.bat scp user@host:/path      Pull + archive + SCP
-REM   git-sync.bat ftp                      Pull + archive + open Explorer
+REM   git-sync.bat              Pull + archive + SCP (uses DEFAULT_DEST)
+REM   git-sync.bat --local      Pull + archive only (no transfer)
+REM   git-sync.bat ftp          Pull + archive + open Explorer
 REM
 REM Run from any git repository root.
-REM Archive saved to .\dist\ (relative to repo root)
 
 setlocal enabledelayedexpansion
+
+REM ═══════════════════════════════════════════════════════════════════════
+REM  EDIT HERE: default SCP destination
+REM ═══════════════════════════════════════════════════════════════════════
+set "DEFAULT_DEST=dc@eupt03:/home/dc/incoming"
+REM ═══════════════════════════════════════════════════════════════════════
 
 REM ── Detect repo ────────────────────────────────────────────────────────
 for /f "tokens=*" %%i in ('git rev-parse --show-toplevel 2^>nul') do set "REPO_ROOT=%%i"
@@ -37,6 +42,7 @@ echo  ========================================
 echo   Repo   : %REPO_NAME%
 echo   Branch : %BRANCH%  (%COMMIT%)
 echo   Output : %ARCHIVE_NAME%
+echo   Dest   : %DEFAULT_DEST%
 echo  ========================================
 echo.
 
@@ -69,19 +75,8 @@ echo.
 REM ── Transfer ───────────────────────────────────────────────────────────
 set "MODE=%~1"
 
-if "%MODE%"=="scp" (
-    set "DEST=%~2"
-    if "!DEST!"=="" (
-        echo [ERROR] Usage: git-sync.bat scp user@host:/path
-        exit /b 1
-    )
-    echo [3/3] SCP transfer...
-    scp "%ARCHIVE_PATH%" "!DEST!/%ARCHIVE_NAME%"
-    if errorlevel 1 (
-        echo [ERROR] SCP failed.
-        exit /b 1
-    )
-    echo   Sent to !DEST!
+if "%MODE%"=="--local" (
+    echo [3/3] Archive ready: %ARCHIVE_PATH%
     goto :done
 )
 
@@ -91,12 +86,24 @@ if "%MODE%"=="ftp" (
     goto :done
 )
 
-echo [3/3] Ready: %ARCHIVE_PATH%
-echo.
-echo   Transfer:  scp "%ARCHIVE_PATH%" user@server:/path/
-echo   Or use Xftp (binary mode)
+REM Default: SCP transfer
+set "DEST=%DEFAULT_DEST%"
+if not "%MODE%"=="" if not "%MODE%"=="--local" if not "%MODE%"=="ftp" (
+    set "DEST=%MODE%"
+)
+
+echo [3/3] Transferring via SCP...
+echo   scp %ARCHIVE_NAME% -^> %DEST%
+scp "%ARCHIVE_PATH%" "%DEST%/%ARCHIVE_NAME%"
+if errorlevel 1 (
+    echo.
+    echo [WARN] SCP failed. Archive saved locally: %ARCHIVE_PATH%
+    echo   Transfer manually via Xftp (binary mode)
+) else (
+    echo   Transferred OK
+)
 
 :done
 echo.
-echo   Server:  bash git-recv.sh %ARCHIVE_NAME%
+echo   Server: bash git-recv.sh %ARCHIVE_NAME%
 echo.
