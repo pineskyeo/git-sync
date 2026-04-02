@@ -8,11 +8,11 @@ REM   git-sync.bat ftp          Pull + archive + open Explorer
 REM
 REM Run from any git repository root.
 
-setlocal enabledelayedexpansion
-
 REM ── Load config ────────────────────────────────────────────────────────
 if exist "%~dp0sync.conf" call "%~dp0sync.conf"
 if "%DEFAULT_DEST%"=="" set "DEFAULT_DEST=user@server:/incoming"
+
+setlocal enabledelayedexpansion
 
 REM ── Detect repo ────────────────────────────────────────────────────────
 for /f "tokens=*" %%i in ('git rev-parse --show-toplevel 2^>nul') do set "REPO_ROOT=%%i"
