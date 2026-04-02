@@ -39,7 +39,14 @@ extract() {
 
     local extracted
     extracted=$(tar tzf "${archive}" | head -1 | cut -d/ -f1)
-    ok "Extracted: ${target}/${extracted}"
+    local extracted_path="${target}/${extracted}"
+    ok "Extracted: ${extracted_path}"
+
+    # Fix Windows CRLF line endings in text files
+    info "Fixing line endings..."
+    find "${extracted_path}" -type f \( -name "*.sh" -o -name "*.c" -o -name "*.h" -o -name "*.conf" -o -name "*.json" -o -name "*.py" -o -name "*.spec" -o -name "Makefile" -o -name "*.mk" \) -exec sed -i 's/\r$//' {} +
+    find "${extracted_path}" -type f -name "*.sh" -exec chmod +x {} +
+    ok "Line endings fixed"
 
     # Auto-build prompt
     if [[ -f "${target}/${extracted}/Makefile" ]]; then
