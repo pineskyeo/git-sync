@@ -4,7 +4,7 @@ REM
 REM Edit REPOS, DIST, DEFAULT_DEST below, then run.
 
 REM ── Load config ────────────────────────────────────────────────────────
-if exist "%~dp0sync.conf" call "%~dp0sync.conf"
+if exist "%~dp0sync.cfg.bat" call "%~dp0sync.cfg.bat"
 if "%DEFAULT_DEST%"=="" set "DEFAULT_DEST=user@server:/incoming"
 if "%REPOS%"=="" set "REPOS=."
 if "%DIST%"=="" set "DIST=%USERPROFILE%\dist"
