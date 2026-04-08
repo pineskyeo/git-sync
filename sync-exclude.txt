@@ -2,7 +2,6 @@
 build
 bin
 lib
-dist
 out
 node_modules
 __pycache__
