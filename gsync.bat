@@ -8,11 +8,16 @@ REM   git-sync.bat ftp          Pull + archive + open Explorer
 REM
 REM Run from any git repository root.
 
+setlocal enabledelayedexpansion
+
 REM ── Load config ────────────────────────────────────────────────────────
 if exist "%~dp0sync.cfg.bat" call "%~dp0sync.cfg.bat"
 if "%DEFAULT_DEST%"=="" set "DEFAULT_DEST=user@server:/incoming"
 
-setlocal enabledelayedexpansion
+REM ── Resolve SCP executable ─────────────────────────────────────────────
+set "SCP_EXE=%WINDIR%\Sysnative\OpenSSH\scp.exe"
+if not exist "%SCP_EXE%" set "SCP_EXE=%WINDIR%\System32\OpenSSH\scp.exe"
+if not exist "%SCP_EXE%" set "SCP_EXE=scp"
 
 REM ── Detect repo ────────────────────────────────────────────────────────
 for /f "tokens=*" %%i in ('git rev-parse --show-toplevel 2^>nul') do set "REPO_ROOT=%%i"
@@ -94,7 +99,7 @@ if not "%MODE%"=="" if not "%MODE%"=="--local" if not "%MODE%"=="ftp" (
 
 echo [3/3] Transferring via SCP...
 echo   scp %ARCHIVE_NAME% -^> %DEST%
-scp "%ARCHIVE_PATH%" "%DEST%/%ARCHIVE_NAME%"
+"%SCP_EXE%" "%ARCHIVE_PATH%" "%DEST%/%ARCHIVE_NAME%"
 if errorlevel 1 (
     echo.
     echo [WARN] SCP failed. Archive saved locally: %ARCHIVE_PATH%
