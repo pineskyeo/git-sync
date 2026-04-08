@@ -59,12 +59,12 @@ REM ── Archive ────────────────────�
 echo [2/3] Creating archive...
 if not exist "%DIST_DIR%" mkdir "%DIST_DIR%"
 
-set "BASE_EXCLUDE=--exclude=.git --exclude=build --exclude=bin --exclude=lib --exclude=out --exclude=*.o --exclude=*.a --exclude=*.so --exclude=*.exe --exclude=*.dll --exclude=*.obj --exclude=*.pdb --exclude=node_modules --exclude=__pycache__"
+set "BASE_EXCLUDE=--exclude=.git --exclude="%REPO_NAME%/dist""
 
 if exist "%EXCLUDE_FILE%" (
-    tar czf "%ARCHIVE_PATH%" %BASE_EXCLUDE% --exclude="%REPO_NAME%/dist" --exclude-from="%EXCLUDE_FILE%" -C "%REPO_ROOT%\.." "%REPO_NAME%"
+    tar czf "%ARCHIVE_PATH%" %BASE_EXCLUDE% --exclude-from="%EXCLUDE_FILE%" -C "%REPO_ROOT%\.." "%REPO_NAME%"
 ) else (
-    tar czf "%ARCHIVE_PATH%" %BASE_EXCLUDE% --exclude="%REPO_NAME%/dist" -C "%REPO_ROOT%\.." "%REPO_NAME%"
+    tar czf "%ARCHIVE_PATH%" %BASE_EXCLUDE% -C "%REPO_ROOT%\.." "%REPO_NAME%"
 )
 
 if errorlevel 1 (
